@@ -1,5 +1,5 @@
 #include <Arduino.h>
-//Bisous
+
 #include <Wire.h>
 #define SDA D7  //Attention à l'ordre (A vérifier)
 #define SCL D8
