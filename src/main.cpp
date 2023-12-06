@@ -1,5 +1,5 @@
 #include <Arduino.h>
- 
+
 #include <Wire.h>
 #define SDA D7  //(A vérifier) (INPUT_PULLUP)
 #define SCL D8  //(INPUT_PULLUP)
