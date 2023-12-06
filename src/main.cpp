@@ -80,7 +80,7 @@ uint16_t delayDeepSleep = 60000;
 #define plein_topic mqtt_topic "/pleinfait"
 
 // 0 - OFF, 1 - Starting, 2 - Pellet loading, 3 - Ignition, 4 - Work, 5 - Brazier cleaning, 6 - Final cleaning, 7 - Standby, 8 - Pellet missing alarm, 9 - Ignition failure alarm, 10 - Alarms (to be investigated)
-
+ 
 // Checksum: Code+Address+Value on hexadecimal calculator
 
 //Adresses
