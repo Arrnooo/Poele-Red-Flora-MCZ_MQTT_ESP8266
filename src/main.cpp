@@ -1,8 +1,8 @@
 #include <Arduino.h>
 
 #include <Wire.h>
-#define SDA D7  //Attention à l'ordre (A vérifier)
-#define SCL D8
+#define SDA D7  //(A vérifier) (INPUT_PULLUP)
+#define SCL D8  //(INPUT_PULLUP)
 
 #include <VL53L0X.h>
 VL53L0X sensor;
