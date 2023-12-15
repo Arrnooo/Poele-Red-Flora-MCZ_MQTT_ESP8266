@@ -1,8 +1,8 @@
 #include <Arduino.h>
 
 #include <Wire.h>
-#define SDA D7  //(A vérifier) (INPUT_PULLUP)
-#define SCL D8  //(INPUT_PULLUP)
+#define SDA D2  //(INPUT_PULLUP)
+#define SCL D2  //(INPUT_PULLUP)
 
 #include <VL53L0X.h>
 VL53L0X sensor;
@@ -10,7 +10,7 @@ VL53L0X sensor;
 #include <SoftwareSerial.h>
 SoftwareSerial StoveSerial;
 #define SERIAL_MODE SWSERIAL_8N2 // 8 data bits, parity none, 2 stop bits
-#define ENABLE_RX D1
+#define ENABLE_RX D8
 #define RX_PIN D5
 #define TX_PIN D6
 
@@ -28,7 +28,7 @@ const int mqtt_port = 1883;
 const uint8_t delayPublish = 200;
 
 //GPIO
-#define THERMPIN D2
+#define THERMPIN D7
 #define BOUTON D3
 #define RESETPIN D0
 
@@ -318,7 +318,7 @@ void callback(char *topic, byte *payload, unsigned int length) // Envoi de X chi
   Serial.println();
   if ((char)payload[1] == '1') // Remplacer [X] par la position du caractère dans le payload et "1" par le message envoyé par jeedom
   {
-    digitalWrite(THERMPIN, LOW);
+    digitalWrite(THERMPIN, HIGH);
     if ((char)payload[2] != '9')
     {
       byte puissanceCall;
@@ -388,7 +388,7 @@ void callback(char *topic, byte *payload, unsigned int length) // Envoi de X chi
   }
   else if ((char)payload[1] == '0')
   {
-    digitalWrite(THERMPIN, HIGH);
+    digitalWrite(THERMPIN, LOW);
   }
   if ((char)payload[4] == '1')
   {
@@ -417,7 +417,7 @@ void setup()
   pinMode(RESETPIN, OUTPUT);
   digitalWrite(RESETPIN, HIGH);
   pinMode(THERMPIN, OUTPUT);
-  digitalWrite(THERMPIN, HIGH);
+  digitalWrite(THERMPIN, LOW);
   pinMode(BOUTON, INPUT);
   Wire.begin(SDA, SCL);
   sensor.setTimeout(500);
