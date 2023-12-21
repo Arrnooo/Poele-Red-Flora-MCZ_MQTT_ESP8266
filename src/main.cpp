@@ -122,11 +122,11 @@ void reconnect()
   {
     delay(100);
     if (millis() > 15000)
-      {
-        Serial.println("MQTT HS Deep Sleep");
-        ESP.deepSleepInstant(delayDeepSleep);
-      }
-   }
+    {
+      Serial.println("MQTT HS Deep Sleep");
+      ESP.deepSleepInstant(delayDeepSleep);
+    }
+  }
 }
 
 void setup_mqtt()
@@ -447,6 +447,16 @@ bool checkEtat()
   return rc;
 }
 
+void checkDistance()
+{
+  distance = sensor.readRangeSingleMillimeters();
+  if (distance < 0 || distance > 500 || sensor.timeoutOccurred())
+  {
+    distance = 9999;
+  }
+  client.publish(distance_topic, String(distance).c_str(), 0);
+}
+
 void setup()
 {
   pinMode(ENABLE_RX, OUTPUT);
@@ -458,11 +468,19 @@ void setup()
   pinMode(THERMPIN, OUTPUT);
   digitalWrite(THERMPIN, LOW);
   pinMode(BOUTON, INPUT);
-  // Wire.begin(SDA, SCL);
-  // sensor.setTimeout(500);
+
+  // Capteur distance
+  Wire.begin(SDA, SCL);
+  sensor.init();
+  sensor.setTimeout(500);
+  sensor.setMeasurementTimingBudget(200000);
+
+  // Liaison série
   Serial.begin(115200);
   StoveSerial.begin(1200, SERIAL_MODE, RX_PIN, TX_PIN, false, 256);
+
   setup_wifi();
+
   setup_mqtt();
   client.setCallback(callback);
   client.subscribe(in_topic);
@@ -493,23 +511,7 @@ void loop()
     previousMillis = currentMillis;
     client.publish(pong_topic, "Connected");
     getStates();
-  }
-
-  if (pellet > 0)
-  {
-    if (currentMillis - previousCheck >= delayCheckTank)
-    {
-      distance = sensor.readRangeSingleMillimeters();
-      client.publish(distance_topic, String(distance).c_str(), 0);
-    }
-  }
-  else
-  {
-    if (currentMillis - previousCheck >= delayCheckTankoff)
-    {
-      distance = sensor.readRangeSingleMillimeters();
-      client.publish(distance_topic, String(distance).c_str(), 0);
-    }
+    checkDistance();
   }
 
   checkEtat();
