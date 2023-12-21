@@ -1,8 +1,8 @@
 #include <Arduino.h>
 
 #include <Wire.h>
-#define SDA D2  //(INPUT_PULLUP)
-#define SCL D2  //(INPUT_PULLUP)
+#define SDA D2 //(INPUT_PULLUP)
+#define SCL D2 //(INPUT_PULLUP)
 
 #include <VL53L0X.h>
 VL53L0X sensor;
@@ -14,53 +14,51 @@ SoftwareSerial StoveSerial;
 #define RX_PIN D5
 #define TX_PIN D6
 
-//Wifi
+// Wifi
 #include <ESP8266WiFi.h>
 #define ssid "HibouHome"
 #define password "0630232210"
 WiFiClient espPoele;
 
-//MQTT
+// MQTT
 #include <PubSubClient.h>
 PubSubClient client(espPoele);
 const char *mqtt_server = "192.168.0.42";
 const int mqtt_port = 1883;
 const uint8_t delayPublish = 200;
 
-//GPIO
+// GPIO
 #define THERMPIN D7
 #define BOUTON D3
 #define RESETPIN D0
 
-//GetState
+// GetState
 const uint16_t delayRefresh = 60000;
 uint32_t previousMillis;
 
 // CheckDistance
-const uint32_t delayCheckTank = 300000; // 5 min
+const uint32_t delayCheckTank = 300000;     // 5 min
 const uint32_t delayCheckTankoff = 3600000; // 1h
 uint32_t previousCheck;
 uint16_t distance;
 
-//Blink LED
-const uint8_t NbchangementEtat = 10;
+// Blink LED
+#define NbchangementEtat 10
+#define blinkTime 200
+uint32_t lastChange = 0;
 uint8_t changementEtat = 0;
 uint8_t lastEtat = HIGH;
 uint8_t demandeBlinkLED = 0;
-const uint8_t blinkTime = 200;
 
-//Bouton
+// Bouton
 #define antiRebond 10
-uint32_t lastappui, now;
-uint32_t lastChange = 0;
-uint8_t lastEtatbouton = 1;
-uint8_t Etatbouton;
+uint32_t lastappui = 0;
 
-//DeepSleep
+// DeepSleep
 uint8_t deepSleep = 0;
 uint16_t delayDeepSleep = 60000;
 
-//Topic
+// Topic
 #define mqtt_topic "Poele"
 
 #define pong_topic mqtt_topic "/pong"
@@ -83,7 +81,7 @@ uint16_t delayDeepSleep = 60000;
 
 // Checksum: Code+Address+Value on hexadecimal calculator
 
-//Adresses
+// Adresses
 #define ReadRAM 0x00
 #define ReadROM 0x20
 #define WriteRAM 0x80
@@ -352,6 +350,7 @@ void callback(char *topic, byte *payload, unsigned int length) // Envoi de X chi
         getState(ReadROM, flamePowerAddr);
       }
     }
+
     if ((char)payload[3] != '9')
     {
       byte ventPowerCall;
@@ -390,22 +389,65 @@ void callback(char *topic, byte *payload, unsigned int length) // Envoi de X chi
   {
     digitalWrite(THERMPIN, LOW);
   }
+
   if ((char)payload[4] == '1')
   {
     digitalWrite(RESETPIN, LOW);
   }
-  if ((char)payload[5] == '1')
+
+  if ((char)payload[5] == '1') // Clignotte
   {
-    demandeBlinkLED = 1;  
+    demandeBlinkLED = 1;
   }
-  else if ((char)payload[5] == '2')
+  else if ((char)payload[5] == '2') // Allume
   {
     digitalWrite(LED_BUILTIN, LOW);
+    lastEtat = LOW;
   }
-  else if ((char)payload[5] == '0')
+  else if ((char)payload[5] == '0') // Eteind
   {
     digitalWrite(LED_BUILTIN, HIGH);
+    lastEtat = HIGH;
   }
+}
+
+void blinkLED()
+{
+
+  if (changementEtat >= NbchangementEtat)
+  {
+    lastChange = millis();
+    demandeBlinkLED = 0;
+    changementEtat = 0;
+    digitalWrite(LED_BUILTIN, HIGH);
+    lastEtat = HIGH;
+  }
+  else if (millis() - lastChange >= blinkTime)
+  {
+    lastChange = millis();
+    changementEtat++;
+    digitalWrite(LED_BUILTIN, !lastEtat);
+    lastEtat = !lastEtat;
+  }
+}
+
+bool checkEtat()
+{
+  bool rc = false;
+  uint8_t lastEtatbouton = 1;
+  uint8_t Etatbouton;
+  uint32_t now = millis();
+  Etatbouton = digitalRead(BOUTON);
+  if (Etatbouton != lastEtatbouton && now - lastappui >= antiRebond)
+  {
+    lastappui = now;
+    lastEtatbouton = Etatbouton;
+    if (Etatbouton == 0)
+    {
+      rc = true;
+    }
+  }
+  return rc;
 }
 
 void setup()
@@ -419,8 +461,8 @@ void setup()
   pinMode(THERMPIN, OUTPUT);
   digitalWrite(THERMPIN, LOW);
   pinMode(BOUTON, INPUT);
-  Wire.begin(SDA, SCL);
-  sensor.setTimeout(500);
+  // Wire.begin(SDA, SCL);
+  // sensor.setTimeout(500);
   Serial.begin(115200);
   StoveSerial.begin(1200, SERIAL_MODE, RX_PIN, TX_PIN, false, 256);
   setup_wifi();
@@ -440,7 +482,7 @@ void loop()
       ESP.deepSleepInstant(delayDeepSleep);
     }
   }
-  
+
   if (!client.connected())
   {
     reconnect();
@@ -456,7 +498,7 @@ void loop()
     getStates();
   }
 
-  if(pellet > 0)
+  if (pellet > 0)
   {
     if (currentMillis - previousCheck >= delayCheckTank)
     {
@@ -472,42 +514,17 @@ void loop()
       client.publish(distance_topic, String(distance).c_str(), 0);
     }
   }
-  
-  now = millis();
-  Etatbouton = digitalRead(BOUTON);
-  if(Etatbouton != lastEtatbouton && now - lastappui >= antiRebond)
+
+  checkEtat();
+
+  if (checkEtat())
   {
-    lastappui = now;
-    lastEtatbouton= Etatbouton;
-    if(Etatbouton == 0)
-    {
-      client.publish(plein_topic, "Plein fait");
-      demandeBlinkLED = 1;
-    }
+    client.publish(plein_topic, "Plein fait");
+    demandeBlinkLED = 1;
   }
 
   if (demandeBlinkLED == 1)
   {
-    if (changementEtat >= NbchangementEtat)
-    {
-      demandeBlinkLED = 0;
-      changementEtat = 0;
-      digitalWrite(LED_BUILTIN, HIGH);
-      lastEtat = LOW;
-      lastChange = millis();
-    }
-    else if (millis() - lastChange >= blinkTime)
-    {
-      lastChange = millis();
-      changementEtat++;
-      digitalWrite(LED_BUILTIN, !lastEtat);
-      lastEtat = !lastEtat;
-    }
-  }
-
-  if (deepSleep == 1) // Does not work without hardaware modification (a cable must be connected between RST and D0)
-  {
-    Serial.println("Deep Sleep");
-    ESP.deepSleepInstant(delayDeepSleep);
+    blinkLED();
   }
 }
