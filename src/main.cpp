@@ -120,16 +120,13 @@ void reconnect()
 {
   while (!client.connected())
   {
-    if (client.connect("espPoele"))
-    {
-      delay(100);
-      if (millis() > 15000)
+    delay(100);
+    if (millis() > 15000)
       {
         Serial.println("MQTT HS Deep Sleep");
         ESP.deepSleepInstant(delayDeepSleep);
       }
-    }
-  }
+   }
 }
 
 void setup_mqtt()
