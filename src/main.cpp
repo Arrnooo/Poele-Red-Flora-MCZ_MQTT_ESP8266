@@ -36,12 +36,6 @@ const uint8_t delayPublish = 200;
 const uint16_t delayRefresh = 60000;
 uint32_t previousMillis;
 
-// CheckDistance
-const uint32_t delayCheckTank = 300000;     // 5 min
-const uint32_t delayCheckTankoff = 3600000; // 1h
-uint32_t previousCheck;
-uint16_t distance;
-
 // Blink LED
 #define NbchangementEtat 10
 #define blinkTime 200
@@ -301,7 +295,11 @@ void getStates() // Calls all the get…() functions
   getState(ReadROM, flamePowerAddr);
 }
 
-void callback(char *topic, byte *payload, unsigned int length) // Envoi de X chiffres,1er Toujours 1, 2ème On/Off (1;0);3ème  puissance (1;2;3;4;5); 4ème Pventil (1;2;3;4.5); 5ème Reset (1;0)
+
+// Reception MQTT sous format 012345 // Jeedom envoi une suite de variable en fonction de la situation
+// [0] Toujours 1, [1] On/Off (1;0), [2] puissance flame (1;2;3;4;5); [3] Puissance ventil (1;2;3;4.5), [4] Reset (0;1); [5] Action LED (0;1;2)
+// Si un reset est demandé, il faut obligatoirement mettre la variable sur 0 après envoi par Jeedom
+void callback(char *topic, byte *payload, unsigned int length) 
 {
   Serial.print("Message arrived [");
   Serial.print(topic);
@@ -449,7 +447,7 @@ bool checkEtat()
 
 void checkDistance()
 {
-  distance = sensor.readRangeSingleMillimeters();
+  uint32_t distance = sensor.readRangeSingleMillimeters();
   if (distance < 0 || distance > 500 || sensor.timeoutOccurred())
   {
     distance = 9999;
