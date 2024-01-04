@@ -1,12 +1,5 @@
 #include <Arduino.h>
 
-#include <Wire.h>
-#define SDA D2 //(INPUT_PULLUP)
-#define SCL D2 //(INPUT_PULLUP)
-
-#include <VL53L0X.h>
-VL53L0X sensor;
-
 #include <SoftwareSerial.h>
 SoftwareSerial StoveSerial;
 #define SERIAL_MODE SWSERIAL_8N2 // 8 data bits, parity none, 2 stop bits
@@ -14,19 +7,25 @@ SoftwareSerial StoveSerial;
 #define RX_PIN D5
 #define TX_PIN D6
 
-// Wifi
+// Wifi// MQTT
 #include <ESP8266WiFi.h>
+#include <PubSubClient.h>
 #define ssid "HibouHome"
 #define password "0630232210"
-WiFiClient espPoele;
-
-// MQTT
-#include <PubSubClient.h>
-PubSubClient client(espPoele);
 const char *mqtt_server = "192.168.0.42";
 const int mqtt_port = 1883;
 const uint8_t delayPublish = 200;
+WiFiClient espPoele;
+PubSubClient client(espPoele);
 
+/*//VL53L0X
+#include <Wire.h>
+#define SDA D2 //(INPUT_PULLUP)
+#define SCL D2 //(INPUT_PULLUP)
+
+#include <VL53L0X.h>
+VL53L0X sensor;
+*/
 // GPIO
 #define THERMPIN D7
 #define BOUTON D3
@@ -45,8 +44,13 @@ uint8_t lastEtat = HIGH;
 uint8_t demandeBlinkLED = 0;
 
 // Bouton
-#define antiRebond 10
+#include "OneButtonTiny.h"
+OneButtonTiny button(BOUTON, true);
+
+#define antiRebond 100
 uint32_t lastappui = 0;
+uint8_t lastEtatbouton = 1;
+uint32_t lastCheck = 0;
 
 // DeepSleep
 uint8_t deepSleep = 0;
@@ -114,11 +118,14 @@ void reconnect()
 {
   while (!client.connected())
   {
-    delay(100);
-    if (millis() > 15000)
+    if (client.connect("espPoele"))
     {
-      Serial.println("MQTT HS Deep Sleep");
-      ESP.deepSleepInstant(delayDeepSleep);
+      delay(100);
+      if (millis() > 15000)
+      {
+        Serial.println("MQTT HS Deep Sleep");
+        ESP.deepSleepInstant(delayDeepSleep);
+      }
     }
   }
 }
@@ -295,11 +302,10 @@ void getStates() // Calls all the get…() functions
   getState(ReadROM, flamePowerAddr);
 }
 
-
 // Reception MQTT sous format 012345 // Jeedom envoi une suite de variable en fonction de la situation
 // [0] Toujours 1, [1] On/Off (1;0), [2] puissance flame (1;2;3;4;5); [3] Puissance ventil (1;2;3;4.5), [4] Reset (0;1); [5] Action LED (0;1;2)
 // Si un reset est demandé, il faut obligatoirement mettre la variable sur 0 après envoi par Jeedom
-void callback(char *topic, byte *payload, unsigned int length) 
+void callback(char *topic, byte *payload, unsigned int length)
 {
   Serial.print("Message arrived [");
   Serial.print(topic);
@@ -426,26 +432,13 @@ void blinkLED()
   }
 }
 
-bool checkEtat()
-{
-  bool rc = false;
-  uint8_t lastEtatbouton = 1;
-  uint8_t Etatbouton;
-  uint32_t now = millis();
-  Etatbouton = digitalRead(BOUTON);
-  if (Etatbouton != lastEtatbouton && now - lastappui >= antiRebond)
+void myClickFunction()
   {
-    lastappui = now;
-    lastEtatbouton = Etatbouton;
-    if (Etatbouton == 0)
-    {
-      rc = true;
-    }
+    client.publish(plein_topic, "Plein fait");
+    demandeBlinkLED = 1;
   }
-  return rc;
-}
 
-void checkDistance()
+/*void checkDistance()
 {
   uint32_t distance = sensor.readRangeSingleMillimeters();
   if (distance < 0 || distance > 500 || sensor.timeoutOccurred())
@@ -453,7 +446,7 @@ void checkDistance()
     distance = 9999;
   }
   client.publish(distance_topic, String(distance).c_str(), 0);
-}
+}*/
 
 void setup()
 {
@@ -465,14 +458,14 @@ void setup()
   digitalWrite(RESETPIN, HIGH);
   pinMode(THERMPIN, OUTPUT);
   digitalWrite(THERMPIN, LOW);
-  pinMode(BOUTON, INPUT);
+  button.attachClick(myClickFunction);
 
-  // Capteur distance
+  /*// Capteur distance
   Wire.begin(SDA, SCL);
   sensor.init();
   sensor.setTimeout(500);
   sensor.setMeasurementTimingBudget(200000);
-
+*/
   // Liaison série
   Serial.begin(115200);
   StoveSerial.begin(1200, SERIAL_MODE, RX_PIN, TX_PIN, false, 256);
@@ -509,16 +502,11 @@ void loop()
     previousMillis = currentMillis;
     client.publish(pong_topic, "Connected");
     getStates();
-    checkDistance();
+    // checkDistance();
   }
 
-  checkEtat();
-
-  if (checkEtat())
-  {
-    client.publish(plein_topic, "Plein fait");
-    demandeBlinkLED = 1;
-  }
+  unsigned long now = millis();
+  button.tick();
 
   if (demandeBlinkLED == 1)
   {
