@@ -18,14 +18,17 @@ const uint8_t delayPublish = 200;
 WiFiClient espPoele;
 PubSubClient client(espPoele);
 
-/*//VL53L0X
+// VL53L0X
 #include <Wire.h>
-#define SDA D2 //(INPUT_PULLUP)
-#define SCL D2 //(INPUT_PULLUP)
-
 #include <VL53L0X.h>
+
 VL53L0X sensor;
-*/
+
+#define PIN_SDA D1
+#define PIN_SCL D2
+
+uint16_t distance;
+
 // GPIO
 #define THERMPIN D7
 #define BOUTON D3
@@ -93,7 +96,7 @@ uint16_t delayDeepSleep = 60000;
 #define ventPowerAddr 0x7E  // ROM
 #define flamePowerAddr 0x7F // ROM
 
-const uint8_t grPelletMin = 47; //  debit vis sans fin poele en gr/min
+const uint8_t grPelletMin = 50; //  debit vis sans fin poele en gr/min
 
 uint8_t stoveState, fumesTemp, ventPower, flamePower, locCheksum;
 uint16_t fumesRPM;
@@ -433,20 +436,25 @@ void blinkLED()
 }
 
 void myClickFunction()
-  {
-    client.publish(plein_topic, "Plein fait");
-    demandeBlinkLED = 1;
-  }
-
-/*void checkDistance()
 {
-  uint32_t distance = sensor.readRangeSingleMillimeters();
-  if (distance < 0 || distance > 500 || sensor.timeoutOccurred())
+  client.publish(plein_topic, "Plein fait");
+  demandeBlinkLED = 1;
+}
+
+uint16_t checkDistance()
+{
+  distance = sensor.readRangeSingleMillimeters() - 20;
+  if (distance < 10)
   {
-    distance = 9999;
+    distance = 0;
   }
-  client.publish(distance_topic, String(distance).c_str(), 0);
-}*/
+  else if (distance > 800)
+  {
+    // envoi erreur
+    Serial.println("Error");
+  }
+  return distance;
+}
 
 void setup()
 {
@@ -460,12 +468,20 @@ void setup()
   digitalWrite(THERMPIN, LOW);
   button.attachClick(myClickFunction);
 
-  /*// Capteur distance
-  Wire.begin(SDA, SCL);
-  sensor.init();
+  Wire.begin(PIN_SDA, PIN_SCL);
   sensor.setTimeout(500);
+  while (!sensor.init())
+  {
+    Wire.begin(PIN_SDA, PIN_SCL);
+    sensor.setTimeout(500);
+    if (millis() > 5000)
+    {
+      // envoi erreur et reboot
+      Serial.println("Failed to detect and initialize sensor!");
+    }
+  }
   sensor.setMeasurementTimingBudget(200000);
-*/
+
   // Liaison série
   Serial.begin(115200);
   StoveSerial.begin(1200, SERIAL_MODE, RX_PIN, TX_PIN, false, 256);
@@ -496,16 +512,20 @@ void loop()
   }
   client.loop();
 
-  uint32_t currentMillis = millis();
-  if (currentMillis - previousMillis >= delayRefresh)
+  uint32_t now = millis();
+  if (now - previousMillis >= delayRefresh)
   {
-    previousMillis = currentMillis;
+    previousMillis = now;
     client.publish(pong_topic, "Connected");
     getStates();
-    // checkDistance();
+    checkDistance();
+    if (distance <= 800)
+    {
+      client.publish(distance_topic, String(distance).c_str(), 0);
+      Serial.println(distance);
+    }
   }
 
-  unsigned long now = millis();
   button.tick();
 
   if (demandeBlinkLED == 1)
