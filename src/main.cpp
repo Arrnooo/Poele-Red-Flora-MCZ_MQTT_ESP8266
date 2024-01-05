@@ -496,16 +496,15 @@ void loop()
   }
   client.loop();
 
-  uint32_t currentMillis = millis();
-  if (currentMillis - previousMillis >= delayRefresh)
+  uint32_t now = millis();
+  if (now - previousMillis >= delayRefresh)
   {
-    previousMillis = currentMillis;
+    previousMillis = now;
     client.publish(pong_topic, "Connected");
     getStates();
     // checkDistance();
   }
 
-  unsigned long now = millis();
   button.tick();
 
   if (demandeBlinkLED == 1)
