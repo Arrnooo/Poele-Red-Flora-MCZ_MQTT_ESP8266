@@ -423,8 +423,8 @@ void blinkLED()
     lastChange = millis();
     demandeBlinkLED = 0;
     changementEtat = 0;
-    digitalWrite(LED_BUILTIN, HIGH);
-    lastEtat = HIGH;
+    digitalWrite(LED_BUILTIN, HIGH);voir pour supprimer 
+    lastEtat = HIGH;voir pour supprimer 
   }
   else if (millis() - lastChange >= blinkTime)
   {
