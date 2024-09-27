@@ -408,7 +408,7 @@ void callback(char *topic, byte *payload, unsigned int length)
     digitalWrite(LED_BUILTIN, LOW);
     lastEtat = LOW;
   }
-  else if ((char)payload[5] == '0') // Eteind
+  else if ((char)payload[5] == '0') // Eteint
   {
     digitalWrite(LED_BUILTIN, HIGH);
     lastEtat = HIGH;
@@ -423,8 +423,8 @@ void blinkLED()
     lastChange = millis();
     demandeBlinkLED = 0;
     changementEtat = 0;
-    digitalWrite(LED_BUILTIN, HIGH);voir pour supprimer 
-    lastEtat = HIGH;voir pour supprimer 
+    //digitalWrite(LED_BUILTIN, HIGH); //voir pour supprimer 
+    //lastEtat = HIGH; //voir pour supprimer 
   }
   else if (millis() - lastChange >= blinkTime)
   {
