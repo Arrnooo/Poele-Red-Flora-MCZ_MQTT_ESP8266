@@ -76,7 +76,7 @@ uint16_t delayDeepSleep = 60000;
 #define distance_topic mqtt_topic "/distance"
 #define conso_topic mqtt_topic "/conso"
 #define puissance_topic mqtt_topic "/puissanceChauffe"
-#define plein_topic mqtt_topic "/pleinfait"
+#define sacvide_topic mqtt_topic "/sacvide"
 
 // 0 - OFF, 1 - Starting, 2 - Pellet loading, 3 - Ignition, 4 - Work, 5 - Brazier cleaning, 6 - Final cleaning, 7 - Standby, 8 - Pellet missing alarm, 9 - Ignition failure alarm, 10 - Alarms (to be investigated)
 
@@ -437,7 +437,7 @@ void blinkLED()
 
 void myClickFunction()
 {
-  client.publish(plein_topic, "Plein fait");
+  client.publish(sacvide_topic, "Sac vide");
   demandeBlinkLED = 1;
 }
 
