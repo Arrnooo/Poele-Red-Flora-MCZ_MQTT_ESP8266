@@ -41,6 +41,7 @@ uint32_t previousMillis;
 // Blink LED
 #define NbchangementEtat 10
 #define blinkTime 200
+#define blinkTimeSlow 500
 uint32_t lastChange = 0;
 uint8_t changementEtat = 0;
 uint8_t lastEtat = HIGH;
@@ -403,6 +404,10 @@ void callback(char *topic, byte *payload, unsigned int length)
   {
     demandeBlinkLED = 1;
   }
+  else if ((char)payload[5] == '3') // clignotte lentement
+  {
+    demandeBlinkLED = 3;
+  }
   else if ((char)payload[5] == '2') // Allume
   {
     digitalWrite(LED_BUILTIN, LOW);
@@ -415,6 +420,17 @@ void callback(char *topic, byte *payload, unsigned int length)
   }
 }
 
+void blinkLedSlow()
+{
+  // Vérifiez si 500 ms se sont écoulés
+  if (millis() - lastChange >= blinkTimeSlow)
+  {
+    lastChange = millis();            // Mettez à jour le temps de dernière modification
+    lastEtat = !lastEtat;                // Changez l'état de la LED
+    digitalWrite(LED_BUILTIN, lastEtat); // Appliquez le nouvel état
+  }
+}
+
 void blinkLED()
 {
 
@@ -423,8 +439,8 @@ void blinkLED()
     lastChange = millis();
     demandeBlinkLED = 0;
     changementEtat = 0;
-    //digitalWrite(LED_BUILTIN, HIGH); //voir pour supprimer 
-    //lastEtat = HIGH; //voir pour supprimer 
+    digitalWrite(LED_BUILTIN, HIGH); // voir pour supprimer
+    lastEtat = HIGH;                 // voir pour supprimer
   }
   else if (millis() - lastChange >= blinkTime)
   {
@@ -531,5 +547,10 @@ void loop()
   if (demandeBlinkLED == 1)
   {
     blinkLED();
+  }
+
+  if (demandeBlinkLED == 3)
+  {
+    blinkLedSlow();
   }
 }
