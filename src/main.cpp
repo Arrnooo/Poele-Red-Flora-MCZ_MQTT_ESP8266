@@ -7,6 +7,9 @@ SoftwareSerial StoveSerial;
 #define RX_PIN D5
 #define TX_PIN D6
 
+//OTA
+#include <ArduinoOTA.h>
+
 // Wifi// MQTT
 #include <ESP8266WiFi.h>
 #include <PubSubClient.h>
@@ -504,6 +507,40 @@ void setup()
   setup_mqtt();
   client.setCallback(callback);
   client.subscribe(in_topic);
+
+  // Configuration OTA
+    ArduinoOTA.setHostname("ESP8266_OTA");
+
+    ArduinoOTA.onStart([]() { 
+#ifdef DEBUG
+        Serial.println("🔄 Démarrage OTA...");
+#endif
+    });
+
+    ArduinoOTA.onEnd([]() { 
+#ifdef DEBUG
+        Serial.println("\n✅ Mise à jour terminée !");
+#endif
+    });
+
+    ArduinoOTA.onProgress([](unsigned int progress, unsigned int total) {
+#ifdef DEBUG
+        Serial.printf("📶 Progression : %u%%\r", (progress / (total / 100)));
+#endif
+    });
+
+    ArduinoOTA.onError([](ota_error_t error) {
+#ifdef DEBUG
+        Serial.printf("❌ Erreur OTA [%u] : ", error);
+        if (error == OTA_AUTH_ERROR) Serial.println("Erreur d'authentification");
+        else if (error == OTA_BEGIN_ERROR) Serial.println("Erreur au démarrage");
+        else if (error == OTA_CONNECT_ERROR) Serial.println("Erreur de connexion");
+        else if (error == OTA_RECEIVE_ERROR) Serial.println("Erreur de réception");
+        else if (error == OTA_END_ERROR) Serial.println("Erreur de finalisation");
+#endif
+    });
+
+    ArduinoOTA.begin();
 }
 
 void loop()
@@ -562,4 +599,6 @@ void loop()
     digitalWrite(LED_BUILTIN, LOW);
     lastEtat = LOW;
   }
+
+  ArduinoOTA.handle(); // Gère les mises à jour OTA en arrière-plan
 }
