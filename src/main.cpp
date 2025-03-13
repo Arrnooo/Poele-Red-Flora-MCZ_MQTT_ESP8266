@@ -10,10 +10,9 @@ SoftwareSerial StoveSerial;
 // Wifi// MQTT
 #include <ESP8266WiFi.h>
 #include <PubSubClient.h>
-#define ssid "HibouHome"
-#define password "0630232210"
-const char *mqtt_server = "192.168.0.42";
-const int mqtt_port = 1883;
+
+#include "config.h"
+
 const uint8_t delayPublish = 200;
 WiFiClient espPoele;
 PubSubClient client(espPoele);
