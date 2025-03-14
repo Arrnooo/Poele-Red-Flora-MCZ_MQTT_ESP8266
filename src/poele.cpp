@@ -1,20 +1,22 @@
+#include "config.h"         // Inclure en premier pour avoir les définitions
 #include "poele.h"
-#include "mqtt_topics.h"   // Pour les noms des topics (voir ci-dessous)
-#include "config.h"
-#include "wifi_mqtt.h"     // Pour accéder à 'client'
+#include "mqtt_topics.h"      // Pour les noms des topics MQTT
+#include "wifi_mqtt.h"        // Pour accéder à 'client'
 #include <Arduino.h>
 
-SoftwareSerial StoveSerial(RX_PIN, TX_PIN);  // Utilise les pins définis dans config.h
+// Initialisation de la communication série vers le poêle
+SoftwareSerial StoveSerial(RX_PIN, TX_PIN); // Utilise les pins définis dans config.h
 
+// Variables globales
 uint8_t flamePower = 0;
 uint8_t ventPower = 0;
 uint8_t demandeBlinkLED = 0;
-const uint8_t delayPublish = delayPublish;  // Utilise la constante définie dans config.h
-
-uint8_t stoveState, fumesTemp, locCheksum;
-uint16_t fumesRPM;
-float ambTemp, cyclePellet, pellet, consoPellet, puissanceChauffe;
+uint8_t stoveState = 0;
+uint8_t fumesTemp = 0;
+uint16_t fumesRPM = 0;
+float ambTemp = 0.0, cyclePellet = 0.0, pellet = 0.0, consoPellet = 0.0, puissanceChauffe = 0.0;
 char stoveRxData[2];
+uint8_t locCheksum = 0;
 
 void setup_poele() {
   StoveSerial.begin(1200, SERIAL_MODE, RX_PIN, TX_PIN, false, 256);

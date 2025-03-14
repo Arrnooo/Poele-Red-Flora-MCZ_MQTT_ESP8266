@@ -1,11 +1,13 @@
 #include "wifi_mqtt.h"
 #include "config.h"
+#include "mqtt_topics.h"  // Pour utiliser les topics MQTT
+#include "poele.h"
 
 WiFiClient espPoele;
 PubSubClient client(espPoele);
 
 void setup_wifi() {
-  WiFi.begin(ssid, password);
+  WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
   #ifdef DEBUG
   Serial.print("Connexion au WiFi...");
   #endif
@@ -13,7 +15,7 @@ void setup_wifi() {
     delay(100);
   }
   #ifdef DEBUG
-  Serial.println("Connecté au WiFi");
+  Serial.println(" Connecté au WiFi");
   #endif
 }
 
@@ -24,6 +26,7 @@ void reconnect() {
       #ifdef DEBUG
       Serial.println("Connecté au MQTT");
       #endif
+      client.subscribe(in_topic);
     }
   }
 }
@@ -43,7 +46,6 @@ void check_wifi_connection() {
 void handle_mqtt() {
   if (!client.connected()) {
     reconnect();
-    client.subscribe(in_topic);
   }
   client.loop();
 }
@@ -59,7 +61,7 @@ void callback(char *topic, byte *payload, unsigned int length) {
   Serial.println();
   #endif
   
-  // Traitement des messages MQTT (adaptable selon vos besoins)
+  // Traitement du message MQTT (adapté à vos besoins)
   if ((char)payload[1] == '1') {
     digitalWrite(THERMPIN, HIGH);
     if ((char)payload[2] != '9') {
@@ -102,7 +104,8 @@ void callback(char *topic, byte *payload, unsigned int length) {
         getState(ReadROM, ventPowerAddr);
       }
     }
-  } else if ((char)payload[1] == '0') {
+  }
+  else if ((char)payload[1] == '0') {
     digitalWrite(THERMPIN, LOW);
   }
   
@@ -112,11 +115,14 @@ void callback(char *topic, byte *payload, unsigned int length) {
   
   if ((char)payload[5] == '1') {
     demandeBlinkLED = 1;
-  } else if ((char)payload[5] == '3') {
+  }
+  else if ((char)payload[5] == '3') {
     demandeBlinkLED = 3;
-  } else if ((char)payload[5] == '2') {
+  }
+  else if ((char)payload[5] == '2') {
     demandeBlinkLED = 2;
-  } else if ((char)payload[5] == '0') {
+  }
+  else if ((char)payload[5] == '0') {
     demandeBlinkLED = 0;
   }
 }

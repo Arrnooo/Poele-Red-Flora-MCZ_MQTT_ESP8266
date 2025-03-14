@@ -1,14 +1,15 @@
-#include <Arduino.h>
 #include "button_led.h"
 #include "config.h"
-#include "wifi_mqtt.h"  // Pour utiliser 'client' dans la fonction de clic
+#include "mqtt_topics.h"   // Pour sacvide_topic
+#include "wifi_mqtt.h"     // Pour accéder à 'client'
 #include "OneButtonTiny.h"
+#include <Arduino.h>
 
 OneButtonTiny button(BOUTON, true);
 
 static void myClickFunction() {
   client.publish(sacvide_topic, "Sac vide");
-  // Optionnel : définir demandeBlinkLED si besoin
+  // Vous pouvez ajouter ici d'autres actions si nécessaire
 }
 
 void setup_button() {

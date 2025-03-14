@@ -6,13 +6,13 @@
 void setup_ota() {
   ArduinoOTA.setHostname("ESP8266_OTA");
 
-  ArduinoOTA.onStart([]() { 
+  ArduinoOTA.onStart([]() {
     #ifdef DEBUG
     Serial.println("🔄 Démarrage OTA...");
     #endif
   });
 
-  ArduinoOTA.onEnd([]() { 
+  ArduinoOTA.onEnd([]() {
     #ifdef DEBUG
     Serial.println("\n✅ Mise à jour terminée !");
     #endif

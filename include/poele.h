@@ -6,11 +6,16 @@
 // Déclaration de l'objet pour la communication série avec le poêle
 extern SoftwareSerial StoveSerial;
 
-// Variables globales utilisées pour le poêle
+// Variables globales pour le poêle
 extern uint8_t flamePower;
 extern uint8_t ventPower;
 extern uint8_t demandeBlinkLED;
-extern const uint8_t delayPublish;
+extern uint8_t stoveState;
+extern uint8_t fumesTemp;
+extern uint16_t fumesRPM;
+extern float ambTemp, cyclePellet, pellet, consoPellet, puissanceChauffe;
+extern char stoveRxData[2];
+extern uint8_t locCheksum;
 
 // Fonctions de gestion du poêle
 void setup_poele();

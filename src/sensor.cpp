@@ -24,7 +24,8 @@ void setup_sensor() {
 
 void handle_sensor() {
   distance = sensor.readRangeSingleMillimeters() - 20;
-  if (distance < 10) distance = 0;
+  if (distance < 10)
+    distance = 0;
   if (distance > 800) {
     #ifdef DEBUG
     Serial.println("Erreur de mesure de distance");

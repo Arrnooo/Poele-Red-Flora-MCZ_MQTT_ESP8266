@@ -12,7 +12,7 @@ void check_wifi_connection();
 void handle_mqtt();
 void callback(char *topic, byte *payload, unsigned int length);
 
-// Les objets externes pour qu'ils soient accessibles dans d'autres modules
+// Objets externes pour être accessibles dans d'autres modules
 extern WiFiClient espPoele;
 extern PubSubClient client;
 
