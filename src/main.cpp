@@ -23,8 +23,6 @@ void setup() {
 void loop() {
   check_wifi_connection();
   handle_mqtt();
-  handle_poele();
-  handle_sensor();
   handle_button();
   handle_ota();
 

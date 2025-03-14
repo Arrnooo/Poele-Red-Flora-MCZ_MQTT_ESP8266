@@ -203,8 +203,3 @@ void getStates() {
   getState(ReadROM, ventPowerAddr);
   getState(ReadROM, flamePowerAddr);
 }
-
-void handle_poele() {
-  getStates();
-  checkStoveReply();
-}

@@ -4,8 +4,8 @@
 #include <Arduino.h>  // Pour uint8_t, uint16_t, etc.
 
 // ===== Paramètres WiFi =====
-#define WIFI_SSID       "HibouHome"
-#define WIFI_PASSWORD   "0630232210"
+#define WIFI_SSID       ""
+#define WIFI_PASSWORD   ""
 
 // ===== Paramètres MQTT =====
 extern const char *mqtt_server;
