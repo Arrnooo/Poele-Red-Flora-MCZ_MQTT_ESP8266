@@ -4,6 +4,7 @@
 // Préfixe commun
 #define mqtt_topic "Poele"
 
+//Doivent correspondre avec les adresses interrogéees
 // Définition des topics
 #define pong_topic         mqtt_topic "/pong"
 #define state_topic        mqtt_topic "/state"

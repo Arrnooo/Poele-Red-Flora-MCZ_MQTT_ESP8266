@@ -10,7 +10,6 @@ SoftwareSerial StoveSerial(RX_PIN, TX_PIN); // Utilise les pins définis dans co
 // Variables globales
 uint8_t flamePower = 0;
 uint8_t ventPower = 0;
-//uint8_t demandeBlinkLED = 0;
 uint8_t stoveState = 0;
 uint8_t fumesTemp = 0;
 uint16_t fumesRPM = 0;
@@ -21,8 +20,11 @@ uint8_t locCheksum = 0;
 void setup_poele() {
   StoveSerial.begin(1200, SERIAL_MODE, RX_PIN, TX_PIN, false, 256);
   pinMode(ENABLE_RX, OUTPUT);
-  pinMode(THERMPIN, OUTPUT);
   digitalWrite(ENABLE_RX, LOW);
+  pinMode(RESETPIN, OUTPUT);
+  digitalWrite(RESETPIN, HIGH);
+  pinMode(THERMPIN, OUTPUT);
+  digitalWrite(THERMPIN, LOW);
   #ifdef DEBUG
   Serial.println("Poêle initialisé");
   #endif

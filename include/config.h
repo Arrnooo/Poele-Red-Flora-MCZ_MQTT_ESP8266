@@ -6,8 +6,20 @@
 //#define DEBUG
 
 // ===== Paramètres WiFi =====
-#define WIFI_SSID       "SSID"
-#define WIFI_PASSWORD   "PWD"
+#include "secrets.h"
+/*
+Créer un fichier secrets.h dans le dossier include avec les informations suivantes
+
+#ifndef SECRETS_H
+#define SECRETS_H
+
+// Informations WiFi
+#define WIFI_SSID "SSID"
+#define WIFI_PASSWORD "PWD"
+
+#endif
+
+*/
 
 // ===== Paramètres MQTT =====
 extern const char *mqtt_server;
@@ -30,6 +42,7 @@ const uint16_t delayDeepSleep = 60000;
 #define PIN_SDA         D1
 #define PIN_SCL         D2
 
+//Identifier et modifier si besoin les adresses ROM et RAM du poêle
 // ===== Paramètres du poêle =====
 #define ReadRAM         0x00
 #define ReadROM         0x20
@@ -43,7 +56,8 @@ const uint16_t delayDeepSleep = 60000;
 #define fumesTempAddr   0x65
 #define ventPowerAddr   0x7E  // ROM
 #define flamePowerAddr  0x7F  // ROM
-const uint8_t grPelletMin = 50;  // débit en grammes/min
+
+const uint8_t grPelletMin = 50;  // débit en grammes/min à mesurer sur votre poêle
 
 // ===== Définition du mode série logiciel =====
 #define SERIAL_MODE SWSERIAL_8N2

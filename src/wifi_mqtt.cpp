@@ -50,6 +50,10 @@ void handle_mqtt() {
   client.loop();  
 }
 
+// Reception MQTT sous format 012345 // Jeedom envoi une suite de variable en fonction de la situation
+// [0] Toujours 1, [1] On/Off (1;0), [2] puissance flame (1;2;3;4;5); [3] Puissance ventil (1;2;3;4.5), [4] Reset (0;1); [5] Action LED (0;1;2)
+// Si un reset est demandé, il faut obligatoirement mettre la variable sur 0 après envoi par Jeedom
+
 void callback(char *topic, byte *payload, unsigned int length) {
   #ifdef DEBUG
   Serial.print("Message reçu [");
