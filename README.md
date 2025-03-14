@@ -1,4 +1,5 @@
 /!\ Fonctionnel mais quelques bugs sur l'allumage de la LED
+Plutôt tester la branche "Restructurée"
 
 # Projet Poêle
 
