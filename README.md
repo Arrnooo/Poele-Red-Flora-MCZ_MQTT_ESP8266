@@ -1,7 +1,7 @@
 # Projet ESP8266 - Gestion de Poêle via MQTT
 
 Ce projet permet de contrôler et de surveiller un poêle à granulés en utilisant un ESP8266 (NodeMCU). Il communique avec un broker MQTT pour envoyer et recevoir des commandes.
-Présence d'un capteur vl53l0x pour connaitre le niveau de pellet dans la cuve.
+Présence d'un capteur VL53L0X pour connaitre le niveau de pellet dans la cuve.
 
 
 ## Fonctionnalités
