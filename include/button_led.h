@@ -3,5 +3,9 @@
 
 void setup_button();
 void handle_button();
+void blinkLED();
+void blinkLedSlow();
+void setup_led();
+void checkDemandeLED();
 
 #endif

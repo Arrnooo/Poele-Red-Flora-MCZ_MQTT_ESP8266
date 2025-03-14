@@ -18,6 +18,7 @@ void setup() {
   setup_sensor();
   setup_button();
   setup_ota();
+  setup_led();
 }
 
 void loop() {
@@ -25,6 +26,7 @@ void loop() {
   handle_mqtt();
   handle_button();
   handle_ota();
+  checkDemandeLED();
 
   // Exécution périodique toutes les delayRefresh millisecondes
   static uint32_t previousMillis = 0;
@@ -32,12 +34,6 @@ void loop() {
     previousMillis = millis();
     client.publish(pong_topic, "Connected");
     getStates();  // Met à jour les états du poêle
-    handle_sensor();  // Met à jour 'distance'
-    if (distance <= 800) {
-      client.publish(distance_topic, String(distance).c_str(), 0);
-      #ifdef DEBUG
-      Serial.println(distance);
-      #endif
-    }
+    handle_sensor();  // Met à jour 'distance'    
   }
 }

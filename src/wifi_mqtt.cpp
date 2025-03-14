@@ -25,16 +25,16 @@ void reconnect() {
       delay(100);
       #ifdef DEBUG
       Serial.println("Connecté au MQTT");
-      #endif
-      client.subscribe(in_topic);
+      #endif      
     }
   }
 }
 
 void setup_mqtt() {
-  client.setServer(mqtt_server, mqtt_port);
   client.setCallback(callback);
+  client.setServer(mqtt_server, mqtt_port);
   reconnect();
+  client.subscribe(in_topic);
 }
 
 void check_wifi_connection() {
@@ -45,9 +45,9 @@ void check_wifi_connection() {
 
 void handle_mqtt() {
   if (!client.connected()) {
-    reconnect();
+    reconnect();          
   }
-  client.loop();
+  client.loop();  
 }
 
 void callback(char *topic, byte *payload, unsigned int length) {
@@ -60,7 +60,7 @@ void callback(char *topic, byte *payload, unsigned int length) {
   }
   Serial.println();
   #endif
-  
+    
   // Traitement du message MQTT (adapté à vos besoins)
   if ((char)payload[1] == '1') {
     digitalWrite(THERMPIN, HIGH);

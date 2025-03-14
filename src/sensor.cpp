@@ -1,5 +1,7 @@
 #include "sensor.h"
 #include "config.h"
+#include "wifi_mqtt.h"        // Pour le client MQTT
+#include "mqtt_topics.h"      // Pour les noms des topics MQTT
 #include <Wire.h>
 #include <VL53L0X.h>
 #include <Arduino.h>
@@ -31,4 +33,12 @@ void handle_sensor() {
     Serial.println("Erreur de mesure de distance");
     #endif
   }
+
+  if (distance <= 800) {
+    client.publish(distance_topic, String(distance).c_str(), 0);
+    #ifdef DEBUG
+    Serial.println(distance);
+    #endif
+  }
+
 }

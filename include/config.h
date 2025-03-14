@@ -3,9 +3,11 @@
 
 #include <Arduino.h>  // Pour uint8_t, uint16_t, etc.
 
+//#define DEBUG
+
 // ===== Paramètres WiFi =====
-#define WIFI_SSID       ""
-#define WIFI_PASSWORD   ""
+#define WIFI_SSID       "SSID"
+#define WIFI_PASSWORD   "PWD"
 
 // ===== Paramètres MQTT =====
 extern const char *mqtt_server;
@@ -23,7 +25,6 @@ const uint16_t delayDeepSleep = 60000;
 #define THERMPIN        D7
 #define BOUTON          D3
 #define RESETPIN        D0
-#define LED_BUILTIN     2    // Vérifiez selon votre carte ESP8266
 
 // ===== Pour le capteur VL53L0X =====
 #define PIN_SDA         D1
