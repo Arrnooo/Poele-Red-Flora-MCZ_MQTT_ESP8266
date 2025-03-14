@@ -101,7 +101,7 @@ uint16_t delayDeepSleep = 60000;
 
 const uint8_t grPelletMin = 50; //  debit vis sans fin poele en gr/min
 
-uint8_t stoveState, fumesTemp, ventPower, flamePower, locCheksum;
+uint8_t stoveState, fumesTemp, ventPower, flamePower, loc;
 uint16_t fumesRPM;
 float ambTemp, cyclePellet, pellet, consoPellet, puissanceChauffe;
 char stoveRxData[2]; // When the heater is sending data, it sends two bytes: a checksum and the value
@@ -159,7 +159,7 @@ void checkStoveReply()
   {
     uint8_t val = stoveRxData[1];
     uint8_t checksum = stoveRxData[0];
-    uint8_t param = checksum - val - locCheksum;
+    uint8_t param = checksum - val - loc;
     Serial.printf("Param=%01x value=%01x ", param, val);
     switch (param)
     {
@@ -288,12 +288,11 @@ void write(uint8_t loc, uint8_t param, uint8_t data)
 
 void getState(uint8_t loc, uint8_t param)
 {
-  locCheksum = loc;
   StoveSerial.write(loc);
   delay(1);
   StoveSerial.write(param);
   checkStoveReply();
-  locCheksum = 0;
+  loc = 0;
 }
 
 void getStates() // Calls all the get…() functions
