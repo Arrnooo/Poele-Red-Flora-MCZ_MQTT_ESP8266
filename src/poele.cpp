@@ -196,7 +196,7 @@ void getState(uint8_t loc, uint8_t param) {
   locCheksum = 0;
 }
 
-void getStates() {
+void handle_poele() {
   getState(ReadRAM, stoveStateAddr);
   getState(ReadRAM, fumesRPMAddr);
   getState(ReadRAM, cyclePelletAddr);
@@ -205,9 +205,4 @@ void getStates() {
   getState(ReadRAM, fumesTempAddr);
   getState(ReadROM, ventPowerAddr);
   getState(ReadROM, flamePowerAddr);
-}
-
-void handle_poele() {
-  getStates();
-  checkStoveReply();
 }

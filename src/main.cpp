@@ -33,7 +33,7 @@ void loop() {
   if (millis() - previousMillis >= delayRefresh) {
     previousMillis = millis();
     client.publish(pong_topic, "Connected");
-    getStates();  // Met à jour les états du poêle
+    handle_poele();  // Met à jour les états du poêle
     handle_sensor();  // Met à jour 'distance'    
   }
 }
