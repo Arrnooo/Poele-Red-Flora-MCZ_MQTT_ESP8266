@@ -61,29 +61,7 @@ const char *mqtt_server = "192.168.***.***";
 const int mqtt_port = 1883;
 ```
 
-## Installation et Configuration
-
-1. **Installer PlatformIO** dans VS Code
-2. **Cloner ce projet** :
-   ```sh
-   git clone https://github.com/votre-repo.git
-   cd votre-repo
-   ```
-3. **Configurer `secrets.h` et 'config.cpp'** (voir section précédente)
-4. **Compiler et téléverser** sur l'ESP8266 avec PlatformIO
-5. **Démarrer un broker MQTT** (Mosquitto, Home Assistant, etc.)
-6. **Vérifier les logs série** pour débugger
-
 ## Utilisation des commandes MQTT
-
-### **Topics MQTT disponibles ezntre autres**
-
-| Topic            | Valeur | Description |
-|-----------------|--------|-------------|
-| `poele/state`   | Off/On | État du poêle |
-| `poele/temp`    | 0-50°C | Température ambiante |
-| `poele/fan`     | 0-5    | Vitesse du ventilateur |
-| `poele/flame`   | 0-5    | Puissance de chauffe |
 
 ### **Exemple de commande MQTT**
 
