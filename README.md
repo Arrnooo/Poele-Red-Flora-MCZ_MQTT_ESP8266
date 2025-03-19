@@ -19,6 +19,11 @@ Présence d'un capteur VL53L0X pour connaitre le niveau de pellet dans la cuve.
 - **Module de communication série** (SoftwareSerial pour communiquer avec le poêle)
 - **Broker MQTT** (ex: Mosquitto sur un Raspberry Pi ou un serveur)
 
+![Screenshot 2025-03-17 at 11-54-51 EasyEDA(Standard) - Un outil de conception de circuits électroniques simple et puissant](https://github.com/user-attachments/assets/8e37bf87-8ef8-4a7c-86c6-ea9156d31235)
+![Screenshot 2025-03-17 at 11-54-33 EasyEDA(Standard) - Un outil de conception de circuits électroniques simple et puissant](https://github.com/user-attachments/assets/070178de-76e1-475d-85b9-4710ec10a80c)
+![Screenshot 2025-03-17 at 11-54-22 EasyEDA(Standard) - Un outil de conception de circuits électroniques simple et puissant](https://github.com/user-attachments/assets/68037ce9-d8f2-48f0-8779-4a3922dd3995)
+
+
 ## Structure du projet
 
 ### 1. **Fichiers principaux**
